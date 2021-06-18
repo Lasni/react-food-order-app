@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Card from "../UI/Card";
 import classes from "./AvailableMeals.module.css";
 import MealItem from "./MealItem";
@@ -31,7 +32,35 @@ const DUMMY_MEALS = [
 ];
 
 const AvailableMeals = (props) => {
-  const mealsList = DUMMY_MEALS.map((meal) => (
+  const [meals, setMeals] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://schwarzmuller-react-http-default-rtdb.europe-west1.firebasedatabase.app/meals.json"
+      );
+      const responseData = await response.json();
+      // console.log(responseData);
+
+      const loadedMeals = [];
+      for (const [key, value] of Object.entries(responseData)) {
+        loadedMeals.push({
+          id: key,
+          name: value.name,
+          description: value.description,
+          price: value.price,
+        });
+      }
+      // console.log('loadedMeals', loadedMeals);
+      setMeals(loadedMeals);
+    };
+    fetchData();
+
+    // cleanup
+    return () => {};
+  }, []);
+
+  const mealsList = meals.map((meal) => (
     <MealItem
       id={meal.id}
       key={meal.id}
